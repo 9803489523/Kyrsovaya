@@ -1,5 +1,8 @@
 import java.util.Comparator;
-
+/**
+ * @author Aleksanr Nozdriuhin, Aleksey Bukatov
+ * this class tests binaty tree methods with various parametrs
+ */
 public class Main {
     public static void main(String[] args) {
         BinaryTree<Integer,String> tree=new BinaryTree<>(new Comparator<Integer>() {

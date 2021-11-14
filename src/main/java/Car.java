@@ -1,3 +1,9 @@
+/**
+ * @author Aleksanr Nozdriuhin, Aleksey Bukatov
+ * class Car with fields model, speed,price
+ * this class needed to test binary tree
+ */
+
 public class Car {
     private  String model;
     private int speed;

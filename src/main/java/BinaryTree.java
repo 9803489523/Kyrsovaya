@@ -1,7 +1,20 @@
 import java.util.Comparator;
 import java.util.Stack;
 
+/**
+ * @author Aleksanr Nozdriuhin, Aleksey Bukatov
+ * class with subclass Entry,
+ * fields comparator, rootEntry
+ * and methods findByKey, delete, insert, print
+ * @param <K> key of tree
+ * @param <V> value of tree
+ */
 public class BinaryTree<K,V> {
+    /**
+     * subclass node of binary tree
+     * @param <K> key
+     * @param <V> value
+     */
     private static class Entry<K,V>{
         K key;
         V value;
@@ -19,89 +32,112 @@ public class BinaryTree<K,V> {
             return String.format("%S, %s",key,value);
         }
     }
+
+    /**
+     * head of tree
+     */
     private Entry<K,V> rootEntry;
+    /**
+     * comparator of tree for compare values of keys
+     */
     private final Comparator<K> comparator;
 
+    /**
+     * constructor
+     */
     public BinaryTree(Comparator<K> comparator) {
         this.rootEntry = null;
         this.comparator=comparator;
     }
 
-    public Entry<K,V> findByKey(K key) { // поиск узла по значению
-        Entry<K,V> currentEntry = rootEntry; // начинаем поиск с корневого узла
-        while (currentEntry.key != key) { // поиск покуда не будет найден элемент или не будут перебраны все
-            if (comparator.compare(currentEntry.key,key)>0) { // движение влево?
+    /**
+     * method, which find node by key
+     * @param key, value for search
+     * @return node of tree with input key
+     */
+    public Entry<K,V> findByKey(K key) {
+        Entry<K,V> currentEntry = rootEntry;
+        while (currentEntry.key != key) {
+            if (comparator.compare(currentEntry.key,key)>0) {
                 currentEntry = currentEntry.left;
-            } else { //движение вправо
+            } else {
                 currentEntry = currentEntry.right;
             }
-            if (currentEntry == null) { // если потомка нет,
-                return null; // возвращаем null
+            if (currentEntry == null) {
+                return null;
             }
         }
-        return currentEntry; // возвращаем найденный элемент
+        return currentEntry;
     }
 
-    public void insert(K key, V value) { // метод вставки нового элемента
-        Entry<K,V> newEntry = new Entry<>(key,value); // создание нового узла
-        if (rootEntry == null) { // если корневой узел не существует
-            rootEntry = newEntry;// то новый элемент и есть корневой узел
+    /**
+     * method to add pair <key,value> to tree
+     * @param key, key of pair
+     * @param value, value of pair
+     */
+    public void insert(K key, V value) {
+        Entry<K,V> newEntry = new Entry<>(key,value);
+        if (rootEntry == null) {
+            rootEntry = newEntry;
         }
-        else { // корневой узел занят
-            Entry<K,V> currentEntry= rootEntry; // начинаем с корневого узла
+        else {
+            Entry<K,V> currentEntry= rootEntry;
             Entry<K,V> parentEntry;
-            while (true) // мы имеем внутренний выход из цикла
+            while (true)
             {
                 parentEntry = currentEntry;
-                if(key.equals(currentEntry.key)) {   // если такой элемент в дереве уже есть, не сохраняем его
-                    return;    // просто выходим из метода
+                if(key.equals(currentEntry.key)) {
+                    return;
                 }
-                else  if (comparator.compare(currentEntry.key,key)>0) {   // движение влево?
+                else  if (comparator.compare(currentEntry.key,key)>0) {
                     currentEntry = currentEntry.left;
-                    if (currentEntry == null){ // если был достигнут конец цепочки,
-                        parentEntry.left=newEntry; //  то вставить слева и выйти из методы
+                    if (currentEntry == null){
+                        parentEntry.left=newEntry;
                         return;
                     }
                 }
-                else { // Или направо?
+                else {
                     currentEntry = currentEntry.right;
-                    if (currentEntry == null) { // если был достигнут конец цепочки,
-                        parentEntry.right=newEntry;  //то вставить справа
-                        return; // и выйти
+                    if (currentEntry == null) {
+                        parentEntry.right=newEntry;
+                        return;
                     }
                 }
             }
         }
     }
 
-    public boolean delete(K key) // Удаление узла с заданным ключом
+    /**
+     * method to delete value by key
+     */
+    public boolean delete(K key)
     {
         Entry<K,V> currentEntry= rootEntry;
         Entry<K,V> parentEntry = rootEntry;
         boolean isLeftChild = true;
-        while (!currentEntry.key.equals(key)) { // начинаем поиск узла
+        while (!currentEntry.key.equals(key)) {
             parentEntry = currentEntry;
-            if (comparator.compare(currentEntry.key,key)>0) { // Определяем, нужно ли движение влево?
+            if (comparator.compare(currentEntry.key,key)>0) {
                 isLeftChild = true;
                 currentEntry = currentEntry.left;
             }
-            else { // или движение вправо?
+            else {
                 isLeftChild = false;
                 currentEntry = currentEntry.right;
             }
             if (currentEntry == null)
-                return false; // yзел не найден
+                return false;
         }
 
-        if (currentEntry.left == null && currentEntry.right == null) { // узел просто удаляется, если не имеет потомков
-            if (currentEntry == rootEntry) // если узел - корень, то дерево очищается
+        if (currentEntry.left == null && currentEntry.right == null) {
+            if (currentEntry == rootEntry)
                 rootEntry = null;
             else if (isLeftChild)
-                parentEntry.left=null; // если нет - узел отсоединяется, от родителя
+                parentEntry.left=null;
             else
                 parentEntry.right=null;
         }
-        else if (currentEntry.right == null) { // узел заменяется левым поддеревом, если правого потомка нет
+        else if (currentEntry.right == null) {
             if (currentEntry == rootEntry)
                 rootEntry = currentEntry.left;
             else if (isLeftChild)
@@ -109,7 +145,7 @@ public class BinaryTree<K,V> {
             else
                 parentEntry.right=currentEntry.left;
         }
-        else if (currentEntry.left == null) { // узел заменяется правым поддеревом, если левого потомка нет
+        else if (currentEntry.left == null) {
             if (currentEntry == rootEntry)
                 rootEntry = currentEntry.right;
             else if (isLeftChild)
@@ -117,8 +153,8 @@ public class BinaryTree<K,V> {
             else
                 parentEntry.right=currentEntry.right;
         }
-        else { // если есть два потомка, узел заменяется преемником
-            Entry<K,V> heir = receiveHeir(currentEntry);// поиск преемника для удаляемого узла
+        else {
+            Entry<K,V> heir = receiveHeir(currentEntry);
             if (currentEntry == rootEntry)
                 rootEntry= heir;
             else if (isLeftChild)
@@ -126,56 +162,55 @@ public class BinaryTree<K,V> {
             else
                 parentEntry.right=heir;
         }
-        return true; // элемент успешно удалён
+        return true;
     }
 
-    // метод возвращает узел со следующим значением после передаваемого аргументом.
-    // для этого он сначала переходим к правому потомку, а затем
-    // отслеживаем цепочку левых потомков этого узла.
     private Entry<K,V> receiveHeir(Entry<K,V> entry) {
         Entry<K,V> parentEntry = entry;
         Entry<K,V> heirEntry = entry;
-        Entry<K,V> currentEntry = entry.right; // Переход к правому потомку
-        while (currentEntry != null) // Пока остаются левые потомки
+        Entry<K,V> currentEntry = entry.right;
+        while (currentEntry != null)
         {
-            parentEntry = heirEntry;// потомка задаём как текущий узел
+            parentEntry = heirEntry;
             heirEntry = currentEntry;
-            currentEntry = currentEntry.left; // переход к левому потомку
+            currentEntry = currentEntry.left;
         }
-        // Если преемник не является
-        if (!heirEntry.equals(entry.right) ) // правым потомком,
-        { // создать связи между узлами
+        if (!heirEntry.equals(entry.right) )
+        {
             parentEntry.left=heirEntry.right;
             heirEntry.right=entry.right;
         }
-        return heirEntry;// возвращаем приемника
+        return heirEntry;
     }
 
-    public void printTree() { // метод для вывода дерева в консоль
-        Stack<Entry<K,V>> globalStack = new Stack<>(); // общий стек для значений дерева
+    /**
+     * method to print all pair in tree
+     */
+    public void printTree() {
+        Stack<Entry<K,V>> globalStack = new Stack<>();
         globalStack.push(rootEntry);
-        int gaps = 32; // начальное значение расстояния между элементами
+        int gaps = 32;
         boolean isRowEmpty = false;
         String separator = "-----------------------------------------------------------------";
-        System.out.println(separator);// черта для указания начала нового дерева
+        System.out.println(separator);
         while (!isRowEmpty) {
-            Stack<Entry<K,V>> localStack = new Stack<>(); // локальный стек для задания потомков элемента
+            Stack<Entry<K,V>> localStack = new Stack<>();
             isRowEmpty = true;
 
             for (int j = 0; j < gaps; j++)
                 System.out.print(' ');
-            while (!globalStack.isEmpty()) { // покуда в общем стеке есть элементы
-                Entry<K,V> temp = (Entry<K, V>) globalStack.pop(); // берем следующий, при этом удаляя его из стека
+            while (!globalStack.isEmpty()) {
+                Entry<K,V> temp = (Entry<K, V>) globalStack.pop();
                 if (temp != null) {
-                    System.out.print(temp); // выводим его значение в консоли
-                    localStack.push(temp.left); // соохраняем в локальный стек, наследники текущего элемента
+                    System.out.print(temp);
+                    localStack.push(temp.left);
                     localStack.push(temp.right);
                     if (temp.left != null ||
                             temp.right != null)
                         isRowEmpty = false;
                 }
                 else {
-                    System.out.print("__");// - если элемент пустой
+                    System.out.print("__");
                     localStack.push(null);
                     localStack.push(null);
                 }
@@ -183,10 +218,10 @@ public class BinaryTree<K,V> {
                     System.out.print(' ');
             }
             System.out.println();
-            gaps /= 2;// при переходе на следующий уровень расстояние между элементами каждый раз уменьшается
+            gaps /= 2;
             while (!localStack.isEmpty())
-                globalStack.push(localStack.pop()); // перемещаем все элементы из локального стека в глобальный
+                globalStack.push(localStack.pop());
         }
-        System.out.println(separator);// подводим черту
+        System.out.println(separator);
     }
 }
